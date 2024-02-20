@@ -32,6 +32,8 @@ if (NOT DEFINED Spglib_Fortran_IS_TOP_LEVEL)
 	endif ()
 endif ()
 
+include(../cmake/SpglibGlobalSetup.cmake)
+
 #[=============================================================================[
 #                                   Options                                   #
 ]=============================================================================]

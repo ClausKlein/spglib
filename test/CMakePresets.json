@@ -10,7 +10,7 @@
   ],
   "configurePresets": [
     {
-      "name": "default",
+      "name": "Debug",
       "displayName": "Default configuration preset",
       "description": "This preset is only available on Windows",
       "condition": {
@@ -43,34 +43,34 @@
   ],
   "buildPresets": [
     {
-      "name": "default",
+      "name": "Debug",
       "displayName": "Default build preset",
-      "configurePreset": "default"
+      "configurePreset": "Debug"
     }
   ],
   "testPresets": [
     {
-      "name": "default",
+      "name": "Debug",
       "displayName": "Default test preset",
-      "configurePreset": "default"
+      "configurePreset": "Debug"
     }
   ],
   "workflowPresets": [
     {
-      "name": "default",
+      "name": "Debug",
       "displayName": "Default workflow",
       "steps": [
         {
           "type": "configure",
-          "name": "default"
+          "name": "Debug"
         },
         {
           "type": "build",
-          "name": "default"
+          "name": "Debug"
         },
         {
           "type": "test",
-          "name": "default"
+          "name": "Debug"
         }
       ]
     }

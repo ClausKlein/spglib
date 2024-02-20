@@ -7,7 +7,7 @@
   },
   "configurePresets": [
     {
-      "name": "Release",
+      "name": "default",
       "displayName": "Default configuration preset",
       "generator": "Ninja",
       "binaryDir": "build",
@@ -34,34 +34,34 @@
   ],
   "buildPresets": [
     {
-      "name": "Release",
+      "name": "default",
       "displayName": "Default build preset",
-      "configurePreset": "Release"
+      "configurePreset": "default"
     }
   ],
   "testPresets": [
     {
-      "name": "Release",
+      "name": "default",
       "displayName": "Default test preset",
-      "configurePreset": "Release"
+      "configurePreset": "default"
     }
   ],
   "workflowPresets": [
     {
-      "name": "Release",
+      "name": "default",
       "displayName": "Default workflow",
       "steps": [
         {
           "type": "configure",
-          "name": "Release"
+          "name": "default"
         },
         {
           "type": "build",
-          "name": "Release"
+          "name": "default"
         },
         {
           "type": "test",
-          "name": "Release"
+          "name": "default"
         }
       ]
     }

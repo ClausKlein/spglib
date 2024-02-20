@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.25...3.29)
 project(example_spglib LANGUAGES C)
 
+include(../../../cmake/SpglibGlobalSetup.cmake)
+
 set(extra_args)
 if (SPGLIB_WITH_Fortran)
 	list(APPEND extra_args

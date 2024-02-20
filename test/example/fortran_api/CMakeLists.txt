@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.25...3.29)
 project(example_spglib LANGUAGES Fortran)
 
+# XXX: NO! CK include(../../../cmake/SpglibGlobalSetup.cmake)
+
 find_package(Spglib REQUIRED COMPONENTS fortran)
 
 add_executable(example example.F90)

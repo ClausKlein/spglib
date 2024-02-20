@@ -24,35 +24,7 @@ else ()
 	set(Spglib_IS_TOP_LEVEL OFF)
 endif ()
 
-if (NOT DEFINED CMAKE_C_STANDARD)
-	set(CMAKE_C_STANDARD 17)
-	set(CMAKE_C_STANDARD_REQUIRED ON)
-	set(CMAKE_C_EXTENSIONS OFF)
-endif ()
-
-if (NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE Release)
-endif ()
-
-set(stageDir ${CMAKE_CURRENT_BINARY_DIR})
-include(GNUInstallDirs)
-
-add_library(Spglib_symspg)
-
-if (NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${stageDir}/${CMAKE_INSTALL_BINDIR})
-	add_custom_command(
-		TARGET Spglib_symspg POST_BUILD
-		COMMAND
-			${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-	)
-endif ()
-if (NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${stageDir}/${CMAKE_INSTALL_LIBDIR})
-endif ()
-if (NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
-	set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${stageDir}/${CMAKE_INSTALL_LIBDIR})
-endif ()
+include(cmake/SpglibGlobalSetup.cmake)
 
 #[=============================================================================[
 #                                   Options                                   #
@@ -130,6 +102,12 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 
 # Main project
+add_library(Spglib_symspg)
+add_custom_command(
+	TARGET Spglib_symspg POST_BUILD
+	COMMAND
+		${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+)
 set_target_properties(Spglib_symspg PROPERTIES
 		VERSION ${PROJECT_VERSION}
 		SOVERSION ${PROJECT_VERSION_MAJOR}
