@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20...3.29)
+cmake_minimum_required(VERSION 3.25...3.29)
 
 #[=============================================================================[
 #                           Basic project definition                           #
@@ -13,29 +13,18 @@ dynamic_version(
 list(APPEND CMAKE_MESSAGE_CONTEXT Spglib)
 project(Spglib
 		VERSION ${PROJECT_VERSION}
-		LANGUAGES C)
+		LANGUAGES C CXX
+)
 set(Spglib_VERSION_FULL ${PROJECT_VERSION_FULL})
 set(Spglib_COMMIT ${GIT_COMMIT})
 
-# Back-porting to PROJECT_IS_TOP_LEVEL to older cmake
-# TODO: Remove when requiring cmake >= 3.21
-if (NOT DEFINED Spglib_IS_TOP_LEVEL)
-	if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-		set(PROJECT_IS_TOP_LEVEL ON)
-		set(Spglib_IS_TOP_LEVEL ON)
-	else ()
-		set(PROJECT_IS_TOP_LEVEL OFF)
-		set(Spglib_IS_TOP_LEVEL OFF)
-	endif ()
+if (PROJECT_IS_TOP_LEVEL)
+	set(Spglib_IS_TOP_LEVEL ON)
+else ()
+	set(Spglib_IS_TOP_LEVEL OFF)
 endif ()
 
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS OFF)
-
-if (NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE Release)
-endif ()
+include(cmake/SpglibGlobalSetup.cmake)
 
 #[=============================================================================[
 #                                   Options                                   #
@@ -71,9 +60,6 @@ include(cmake/PackageCompsHelper.cmake)
 include(FetchContent)
 if (SPGLIB_INSTALL)
 	include(CMakePackageConfigHelpers)
-	if (UNIX)
-		include(GNUInstallDirs)
-	endif ()
 endif ()
 
 # Define basic parameters
@@ -88,7 +74,6 @@ set(CMAKE_MACOSX_RPATH 1)
 # Windows setup
 if (WIN32)
 	# Make sure there is a .lib file to link to
-	set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 	# Add appropriate debug flags
 	set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>")
 endif ()
@@ -111,14 +96,25 @@ endif ()
 #                               Main definition                               #
 ]=============================================================================]
 
+# Hide things by default
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
+
 # Main project
 add_library(Spglib_symspg)
+add_custom_command(
+	TARGET Spglib_symspg POST_BUILD
+	COMMAND
+		${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+)
 set_target_properties(Spglib_symspg PROPERTIES
 		VERSION ${PROJECT_VERSION}
 		SOVERSION ${PROJECT_VERSION_MAJOR}
 		EXPORT_NAME symspg
 		OUTPUT_NAME symspg)
 add_library(Spglib::symspg ALIAS Spglib_symspg)
+
 # Main definitions inside src
 add_subdirectory(src)
 
@@ -149,6 +145,8 @@ configure_file(cmake/PackageCompsHelper.cmake PackageCompsHelper.cmake COPYONLY)
 #  Check how bundled cmake searches CMAKE_MODULE_DIR and add accordingly
 #  (use SKBUILD_PLATLIB_DIR for install root)
 if (NOT SKBUILD AND SPGLIB_INSTALL)
+	include(CPack)
+
 	# pkg-config files
 	configure_file(cmake/spglib.pc.in spglib.pc @ONLY)
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/spglib.pc
@@ -173,7 +171,7 @@ if (NOT SKBUILD AND SPGLIB_INSTALL)
 endif ()
 
 # Make project available for FetchContent
-if(NOT PROJECT_IS_TOP_LEVEL)
+if (NOT PROJECT_IS_TOP_LEVEL)
 	# Set variables for FetchContent
 	# All variables have to be consistent with SpglibConfig.cmake
 	set(Spglib_Fortran ${SPGLIB_WITH_Fortran})

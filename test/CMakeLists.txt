@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20...3.29)
+cmake_minimum_required(VERSION 3.25...3.29)
 
 #[=============================================================================[
 #                           Basic project definition                           #
@@ -9,16 +9,16 @@ project(Spglib_Test
 		LANGUAGES CXX C
 )
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS OFF)
+include(../cmake/SpglibGlobalSetup.cmake)
 
 #[=============================================================================[
 #                                   Options                                   #
 ]=============================================================================]
+
+option(TEST_INSTALLED_VERSION "Test the version found by find_package" PROJECT_IS_TOP_LEVEL)
+if (TEST_INSTALLED_VERSION)
+	find_package(Spglib REQUIRED)
+endif ()
 
 include(CMakeDependentOption)
 include(FeatureSummary)
@@ -74,7 +74,7 @@ set(external_libs)
 include(FetchContent)
 
 # Get Spglib if it's run as stand-alone project
-if (NOT Spglib_IS_TOP_LEVEL)
+if (NOT TARGET Spglib::symspg)
 	FetchContent_Declare(Spglib
 			GIT_REPOSITORY https://github.com/spglib/spglib
 			GIT_TAG develop
@@ -242,6 +242,8 @@ function(Spglib_add_test test)
 	set(extra_args)
 	if (Spglib_IS_TOP_LEVEL)
 		list(APPEND extra_args
+				--debug-find-pkg=Spglib
+				# New in version 3.24
 				-DFETCHCONTENT_TRY_FIND_PACKAGE_MODE=ALWAYS
 				# Generated Config file point to binary targets until it is installed
 				-DSpglib_ROOT=${Spglib_BINARY_DIR}
@@ -250,6 +252,7 @@ function(Spglib_add_test test)
 	endif ()
 	list(APPEND extra_args
 			-DSPGLIB_WITH_Fortran=${SPGLIB_WITH_Fortran}
+			-DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
 	)
 	set(compiler_args)
 	foreach (lang IN ITEMS C CXX Fortran)
@@ -259,7 +262,12 @@ function(Spglib_add_test test)
 	endforeach ()
 
 	add_test(NAME ${ARGS_TEST_NAME}
-			COMMAND ${CMAKE_CTEST_COMMAND} --build-and-test ${CMAKE_CURRENT_SOURCE_DIR}/${test}
+			WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+			COMMAND ${CMAKE_COMMAND} -E env --modify PATH=path_list_prepend:${CMAKE_INSTALL_PREFIX}/bin
+			--
+			${CMAKE_CTEST_COMMAND}
+			--rerun-failed --output-on-failure
+			--build-and-test ${CMAKE_CURRENT_SOURCE_DIR}/${test}
 			${CMAKE_CURRENT_BINARY_DIR}/${test}
 			# Use the same build environment as the current runner
 			--build-generator "${CMAKE_GENERATOR}"
@@ -276,5 +284,11 @@ endfunction()
 add_subdirectory(unit)
 add_subdirectory(integration)
 add_subdirectory(functional)
-add_subdirectory(package)
+if (UNIX)
+	# TODO: symlinks used! CK
+	add_subdirectory(package)
+	# package/pkg-config/src -> ../src/
+	# package/FetchContent/src -> ../src/
+	# package/find_package/src -> ../src/
+endif ()
 add_subdirectory(example)

@@ -84,5 +84,7 @@ doc/api/python-api/
 /python/spglib/_version.py
 venv
 env
+.direnv/
 .venv
 .env
+.vs/

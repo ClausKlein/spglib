@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.20...3.29)
 project(example_spglib LANGUAGES C)
 
+include(../../../cmake/SpglibGlobalSetup.cmake)
+
 include(FetchContent)
 
 if (DEFINED ENV{PACKIT_SOURCE_URL})

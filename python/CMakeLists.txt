@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20...3.29)
+cmake_minimum_required(VERSION 3.25...3.29)
 
 #[=============================================================================[
 #                           Basic project definition                           #
@@ -8,6 +8,7 @@ list(APPEND CMAKE_MESSAGE_CONTEXT Python)
 project(Spglib_Python
 		LANGUAGES C
 )
+
 # Back-porting to PROJECT_IS_TOP_LEVEL to older cmake
 # TODO: Remove when requiring cmake >= 3.21
 if (NOT DEFINED Spglib_Python_IS_TOP_LEVEL)
@@ -18,13 +19,7 @@ if (NOT DEFINED Spglib_Python_IS_TOP_LEVEL)
 	endif ()
 endif ()
 
-set(CMAKE_C_STANDARD 11)
-set(CMAKE_C_STANDARD_REQUIRED ON)
-set(CMAKE_C_EXTENSIONS OFF)
-
-if (NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE Release)
-endif ()
+include(../cmake/SpglibGlobalSetup.cmake)
 
 #[=============================================================================[
 #                                   Options                                   #

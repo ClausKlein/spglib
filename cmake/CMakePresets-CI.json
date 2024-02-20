@@ -171,6 +171,12 @@
       "inherits": [
         "ci-base"
       ],
+      "description": "This preset is only available on Windows",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
       "binaryDir": "cmake-build-ci-windows",
       "cacheVariables": {
         "CMAKE_C_COMPILER": {
@@ -181,14 +187,9 @@
           "type": "FILEPATH",
           "value": "cl"
         },
-        "SPGLIB_WITH_Fortran": {
-          "type": "BOOL",
-          "value": false
-        },
-        "SPGLIB_SHARED_LIBS": {
-          "type": "BOOL",
-          "value": false
-        }
+        "SPGLIB_WITH_Fortran": false,
+        "SPGLIB_WITH_Python": false,
+        "SPGLIB_SHARED_LIBS": true
       }
     },
     {
